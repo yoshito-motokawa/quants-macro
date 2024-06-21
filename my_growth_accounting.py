@@ -1,4 +1,5 @@
 import pandas as pd
+from pprint import pprint
 pd.set_option('display.max_columns', None)
 
 # Load data
@@ -8,7 +9,7 @@ pwt1001 = pd.read_stata(url)
 # Filter and select relevant columns and countries
 countries = ['Australia', 'Austria', 'Belgium', 'Canada', 'Denmark', 'Finland', 'France', 'Germany', 'Greece', 'Iceland', 'Ireland', 'Italy', 'Japan', 'Netherlands', 'New Zealand', 'Norway', 'Portugal', 'Spain', 'Sweden', 'Switzerland', 'United Kingdom', 'United States']
 data = pwt1001.loc[pwt1001['country'].isin(countries)][['country', 'countrycode', 'year', 'rgdpna', 'rkna', 'emp', 'avh', 'labsh', 'rtfpna']]
-data = data.loc[(data['year'] >= 1970) & (data['year'] <= 2015)].dropna()
+data = data.loc[(data['year'] >= 1990) & (data['year'] <= 2019)].dropna()
 
 # Calculate additional variables
 data['alpha'] = 1 - data['labsh']
@@ -32,4 +33,19 @@ data = data.sort_values(['countrycode', 'year']).groupby('countrycode').apply(la
 results = data.groupby('country')[['growth_rate', 'tfp_growth', 'capital_deepening', 'labor_growth', 'tfp_share', 'capital_share', 'labor_share']].mean().reset_index()
 
 # Print the results with percentages
-print(results[['country', 'growth_rate', 'tfp_growth', 'capital_deepening', 'labor_growth']].rename(columns={'growth_rate': 'GDP Growth Rate (%)', 'tfp_growth': 'TFP Growth Rate (%)', 'capital_deepening': 'Capital Deepening (%)', 'labor_growth': 'Labor Growth (%)'}).join(results[['tfp_share', 'capital_share', 'labor_share']].rename(columns={'tfp_share': 'TFP Share', 'capital_share': 'Capital Share', 'labor_share': 'Labor Share'})))
+pd.set_option('display.float_format', lambda x: '{:.2f}'.format(x))
+
+print(results[['country', 'growth_rate', 'tfp_growth', 'capital_deepening', 'labor_growth']]
+      .rename(columns={
+          'growth_rate': 'GDP Growth Rate (%)',
+          'tfp_growth': 'TFP Growth Rate (%)',
+          'capital_deepening': 'Capital Deepening (%)',
+          'labor_growth': 'Labor Growth (%)'
+      })
+      .join(results[['tfp_share', 'capital_share', 'labor_share']]
+            .rename(columns={
+                'tfp_share': 'TFP Share',
+                'capital_share': 'Capital Share',
+                'labor_share': 'Labor Share'
+            }))
+      .to_string(index=False))
