@@ -3,6 +3,8 @@ import pandas_datareader.data as web
 import matplotlib.pyplot as plt
 import statsmodels.api as sm
 import numpy as np
+import seaborn as sns
+sns.set()
 
 # Set start and end dates
 start_date = '1994-01-01'
